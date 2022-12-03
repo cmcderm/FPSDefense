@@ -1,0 +1,85 @@
+[gd_scene load_steps=8 format=2]
+
+[ext_resource path="res://Scripts/Player.tscn" type="PackedScene" id=1]
+
+[sub_resource type="BoxShape" id=1]
+
+[sub_resource type="CubeMesh" id=2]
+
+[sub_resource type="BoxShape" id=3]
+
+[sub_resource type="CubeMesh" id=4]
+
+[sub_resource type="BoxShape" id=5]
+
+[sub_resource type="CubeMesh" id=6]
+
+[node name="Spatial" type="Spatial"]
+
+[node name="DirectionalLight" type="DirectionalLight" parent="."]
+transform = Transform( 0.00962288, 0.620381, -0.784241, -0.0076117, 0.7843, 0.620335, 0.999925, 0, 0.0122694, -4.10826, 3.08887, -0.289841 )
+light_energy = 0.266
+shadow_enabled = true
+
+[node name="Player" parent="." instance=ExtResource( 1 )]
+transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.33121, 0 )
+
+[node name="Environment" type="Node" parent="."]
+
+[node name="Ground" type="StaticBody" parent="Environment"]
+transform = Transform( 40, 0, 0, 0, 0.1, 0, 0, 0, 40, 0, -1.1, 0 )
+
+[node name="CollisionShape" type="CollisionShape" parent="Environment/Ground"]
+shape = SubResource( 1 )
+
+[node name="MeshInstance" type="MeshInstance" parent="Environment/Ground"]
+mesh = SubResource( 2 )
+
+[node name="RigidBody" type="RigidBody" parent="Environment"]
+transform = Transform( 0.809273, 0.587432, 0, -0.587432, 0.809273, 0, 0, 0, 1, 2.59593, 1.17472, 0 )
+
+[node name="CollisionShape" type="CollisionShape" parent="Environment/RigidBody"]
+shape = SubResource( 3 )
+
+[node name="MeshInstance" type="MeshInstance" parent="Environment/RigidBody"]
+mesh = SubResource( 4 )
+
+[node name="StaticBody" type="StaticBody" parent="Environment"]
+transform = Transform( 1, 0, 0, 0, 0.737466, 0, 0, 0, 1, 0, 3.139, -40 )
+
+[node name="CollisionShape" type="CollisionShape" parent="Environment/StaticBody"]
+shape = SubResource( 5 )
+
+[node name="MeshInstance" type="MeshInstance" parent="Environment/StaticBody"]
+transform = Transform( 39.6786, 0, 0, 0, 5.57488, 0, 0, 0, 1, 0, 0, 0 )
+mesh = SubResource( 6 )
+
+[node name="StaticBody4" type="StaticBody" parent="Environment"]
+transform = Transform( 1, 0, 0, 0, 0.737466, 0, 0, 0, 1, 0, 3.139, 40 )
+
+[node name="CollisionShape" type="CollisionShape" parent="Environment/StaticBody4"]
+shape = SubResource( 5 )
+
+[node name="MeshInstance" type="MeshInstance" parent="Environment/StaticBody4"]
+transform = Transform( 39.6786, 0, 0, 0, 5.57488, 0, 0, 0, 1, 0, 0, 0 )
+mesh = SubResource( 6 )
+
+[node name="StaticBody2" type="StaticBody" parent="Environment"]
+transform = Transform( -4.37114e-08, 0, 1, 0, 0.737466, 0, -1, 0, -4.37114e-08, -40, 3, 0 )
+
+[node name="CollisionShape" type="CollisionShape" parent="Environment/StaticBody2"]
+shape = SubResource( 5 )
+
+[node name="MeshInstance" type="MeshInstance" parent="Environment/StaticBody2"]
+transform = Transform( 39.6786, 0, 0, 0, 5.57488, 0, 0, 0, 1, 0, 0, 0 )
+mesh = SubResource( 6 )
+
+[node name="StaticBody3" type="StaticBody" parent="Environment"]
+transform = Transform( -4.37114e-08, 0, 1, 0, 0.737466, 0, -1, 0, -4.37114e-08, 40, 3, 0 )
+
+[node name="CollisionShape" type="CollisionShape" parent="Environment/StaticBody3"]
+shape = SubResource( 5 )
+
+[node name="MeshInstance" type="MeshInstance" parent="Environment/StaticBody3"]
+transform = Transform( 39.6786, 0, 0, 0, 5.57488, 0, 0, 0, 1, 0, 0, 0 )
+mesh = SubResource( 6 )
