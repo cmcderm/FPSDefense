@@ -4,33 +4,60 @@ using System.Collections.Generic;
 
 public class Player : KinematicBody
 {
-	// Declare member variables here. Examples:
-	// private int a = 2;
-	// private string b = "text";
-	[Export] private int speed = 10;
-	[Export] private int h_acceleration = 6;
+	[Export] private int speed = 7;
+	const int ACCEL_DEFAULT = 7;
+	const int ACCEL_AIR = 1;
+	[Export] private int accel = ACCEL_DEFAULT;
 	[Export] private float mouseSensitivity = 0.03f;
 	[Export] private float gravity = 9.81f;
+	[Export] private float jump = 5f;
 
-	private Vector3 direction = Vector3.Zero;
-	private Vector3 h_velocity = Vector3.Zero;
-	private Vector2 mouseLookDelta = Vector2.Zero;
+	private int camAccel = 40;
+	private float mouseSense = 0.1f;
+	private Vector3 snap;
+
+	private Vector3 direction = new Vector3();
+	private Vector3 velocity = new Vector3();
+	private Vector3 gravityVel = new Vector3();
+	private Vector3 movement = new Vector3();
+	private Vector2 mouseLookDelta = new Vector2();
+
 	private Spatial head;
+	private Camera camera;
 
 	// Called when the node enters the scene tree for the first time.
 	public override void _Ready()
 	{
 		this.head = GetNode<Spatial>("Head");
+		this.camera = GetNode<Camera>("Head/Camera");
+
+		this.accel = ACCEL_DEFAULT;
+
 		Input.MouseMode = Input.MouseModeEnum.Captured;
 	}
 
 	// Called every frame. 'delta' is the elapsed time since the previous frame.
 	public override void _Process(float delta)
 	{
+		// Unlock the Mouse on 'pause'
 		if (Input.IsActionJustPressed("pause")) {
 			Input.MouseMode = Input.MouseModeEnum.Visible;
 		} else if (Input.MouseMode == Input.MouseModeEnum.Visible && Input.IsActionJustPressed("primary")) {
 			Input.MouseMode = Input.MouseModeEnum.Captured;
+		}
+
+		if (Engine.GetFramesPerSecond() > Engine.IterationsPerSecond) {
+			camera.SetAsToplevel(true);
+			camera.GlobalTransform = new Transform(
+				camera.GlobalTransform.basis,
+				camera.GlobalTransform.origin.LinearInterpolate(
+					this.head.GlobalTransform.origin,
+					camAccel * delta
+				)
+			);
+		} else {
+			camera.SetAsToplevel(false);
+			camera.GlobalTransform = head.GlobalTransform;
 		}
 	}
 
@@ -49,31 +76,38 @@ public class Player : KinematicBody
 
 	public override void _PhysicsProcess(float delta)
 	{
-		Vector3 direction = this.getMovementDir(delta);
-		MoveAndSlide(direction * speed, Vector3.Up);
+		Vector3 directionSpeed = this.getMovementDir(delta);
+		MoveAndSlideWithSnap(direction, snap, Vector3.Up);
 	}
 
 	private Vector3 getMovementDir(float delta) {
-		Vector3 direction = new Vector3();
+		Vector3 direction = Vector3.Zero;
 
-		// Basis globalBasis = GlobalTransform.basis;
+		float hRot = GlobalTransform.basis.GetEuler().y;
+		float fInput = Input.GetActionStrength("move_back") - Input.GetActionStrength("move_forward");
+		float hInput = Input.GetActionStrength("move_right") - Input.GetActionStrength("move_left");
 
-		if (Input.IsActionPressed("move_forward")) {
-			direction -= Transform.basis.z;
-		} else if (Input.IsActionPressed("move_back")) {
-			direction += Transform.basis.z;
+		direction = new Vector3(hInput, 0, fInput).Rotated(Vector3.Up, hRot).Normalized();
+
+		if (IsOnFloor()) {
+			snap = -GetFloorNormal();
+			accel = ACCEL_DEFAULT;
+			gravityVel = Vector3.Zero;
+		} else {
+			snap = Vector3.Down;
+			accel = ACCEL_AIR;
+			gravityVel += Vector3.Down * gravity * delta;
 		}
 
-		if (Input.IsActionPressed("move_left")) {
-			direction -= Transform.basis.x;
-		} else if (Input.IsActionPressed("move_right")) {
-			direction += Transform.basis.x;
+		if (Input.IsActionJustPressed("jump") && IsOnFloor()) {
+			snap = Vector3.Zero;
+			gravityVel = Vector3.Up * jump;
 		}
 
+		// Move
+		velocity = velocity.LinearInterpolate(direction * speed, accel * delta);
+		movement = velocity + gravityVel;
 
-		direction = direction.Normalized();
-		h_velocity = h_velocity.LinearInterpolate(direction * speed, h_acceleration * delta);
-		.z = h_velocity.z;
-
+		return movement;
 	}
 }
