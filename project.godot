@@ -67,6 +67,10 @@ primary={
  ]
 }
 
+[mono]
+
+project/assembly_name="FPSDefense"
+
 [physics]
 
 common/enable_pause_aware_picking=true
