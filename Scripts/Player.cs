@@ -12,15 +12,11 @@ public class Player : KinematicBody
 	[Export] private float gravity = 9.81f;
 	[Export] private float jump = 5f;
 
-	private int camAccel = 40;
-	private float mouseSense = 0.1f;
 	private Vector3 snap;
 
-	private Vector3 direction = new Vector3();
 	private Vector3 velocity = new Vector3();
 	private Vector3 gravityVel = new Vector3();
 	private Vector3 movement = new Vector3();
-	private Vector2 mouseLookDelta = new Vector2();
 
 	private Spatial head;
 	private Camera camera;
@@ -45,39 +41,26 @@ public class Player : KinematicBody
 		} else if (Input.MouseMode == Input.MouseModeEnum.Visible && Input.IsActionJustPressed("primary")) {
 			Input.MouseMode = Input.MouseModeEnum.Captured;
 		}
-
-		if (Engine.GetFramesPerSecond() > Engine.IterationsPerSecond) {
-			camera.SetAsToplevel(true);
-			camera.GlobalTransform = new Transform(
-				camera.GlobalTransform.basis,
-				camera.GlobalTransform.origin.LinearInterpolate(
-					this.head.GlobalTransform.origin,
-					camAccel * delta
-				)
-			);
-		} else {
-			camera.SetAsToplevel(false);
-			camera.GlobalTransform = head.GlobalTransform;
-		}
 	}
 
 	public override void _Input(InputEvent @event)
 	{
 		if (@event is InputEventMouseMotion mouseEvent) {
-			RotateY(Mathf.Deg2Rad(-mouseEvent.Relative.x * this.mouseSensitivity));
-			this.head.RotateX(Mathf.Deg2Rad(-mouseEvent.Relative.y * this.mouseSensitivity));
-			this.head.Rotation = new Vector3(
-				Mathf.Clamp(this.head.Rotation.x, Mathf.Deg2Rad(-89), Mathf.Deg2Rad(89)),
-				this.Rotation.y,
-				this.Rotation.z
+			Vector3 lookDelta = new Vector3(
+				Mathf.Clamp(Mathf.Deg2Rad(-mouseEvent.Relative.y * this.mouseSensitivity), Mathf.Deg2Rad(-89), Mathf.Deg2Rad(89)),
+				Mathf.Deg2Rad(-mouseEvent.Relative.x * this.mouseSensitivity),
+				0
 			);
+
+			this.RotateY(lookDelta.y);
+			this.head.RotateX(lookDelta.x);
 		}
 	}
 
 	public override void _PhysicsProcess(float delta)
 	{
 		Vector3 directionSpeed = this.getMovementDir(delta);
-		MoveAndSlideWithSnap(direction, snap, Vector3.Up);
+		MoveAndSlideWithSnap(directionSpeed, snap, Vector3.Up);
 	}
 
 	private Vector3 getMovementDir(float delta) {
@@ -90,17 +73,17 @@ public class Player : KinematicBody
 		direction = new Vector3(hInput, 0, fInput).Rotated(Vector3.Up, hRot).Normalized();
 
 		if (IsOnFloor()) {
-			snap = -GetFloorNormal();
-			accel = ACCEL_DEFAULT;
-			gravityVel = Vector3.Zero;
+			this.snap = -GetFloorNormal();
+			this.accel = ACCEL_DEFAULT;
+			this.gravityVel = Vector3.Zero;
 		} else {
-			snap = Vector3.Down;
-			accel = ACCEL_AIR;
-			gravityVel += Vector3.Down * gravity * delta;
+			this.snap = Vector3.Down;
+			this.accel = ACCEL_AIR;
+			this.gravityVel += Vector3.Down * gravity * delta;
 		}
 
 		if (Input.IsActionJustPressed("jump") && IsOnFloor()) {
-			snap = Vector3.Zero;
+			this.snap = Vector3.Zero;
 			gravityVel = Vector3.Up * jump;
 		}
 
