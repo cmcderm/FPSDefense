@@ -17,33 +17,33 @@ script = ExtResource( 2 )
 transform = Transform( 1, 0, 0, 0, 1.182, 0, 0, 0, 1, 0, 1.402, -0.034 )
 shape = SubResource( 1 )
 
-[node name="Spatial" type="Spatial" parent="."]
+[node name="Body" type="Spatial" parent="."]
 
-[node name="Base" type="MeshInstance" parent="Spatial"]
+[node name="Base" type="MeshInstance" parent="Body"]
 transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.5, 0 )
 mesh = ExtResource( 1 )
 skeleton = NodePath("../..")
 
-[node name="Door" type="MeshInstance" parent="Spatial"]
+[node name="Door" type="MeshInstance" parent="Body"]
 transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.058, 0 )
 mesh = ExtResource( 5 )
 skeleton = NodePath("../..")
 
-[node name="Rotator" type="Spatial" parent="Spatial"]
+[node name="Rotator" type="Spatial" parent="Body"]
 
-[node name="Rotator" type="MeshInstance" parent="Spatial/Rotator"]
+[node name="Rotator" type="MeshInstance" parent="Body/Rotator"]
 transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.2, 0 )
 mesh = ExtResource( 4 )
 skeleton = NodePath("../../..")
 
-[node name="Head" type="Spatial" parent="Spatial/Rotator"]
+[node name="Head" type="Spatial" parent="Body/Rotator"]
 
-[node name="Head" type="MeshInstance" parent="Spatial/Rotator/Head"]
+[node name="Head" type="MeshInstance" parent="Body/Rotator/Head"]
 transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2, 0 )
 mesh = ExtResource( 6 )
 skeleton = NodePath("../../../..")
 
-[node name="Barrels" type="MeshInstance" parent="Spatial/Rotator/Head"]
+[node name="Barrels" type="MeshInstance" parent="Body/Rotator/Head"]
 transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2.158, -0.78 )
 mesh = ExtResource( 3 )
 skeleton = NodePath("../../../..")
